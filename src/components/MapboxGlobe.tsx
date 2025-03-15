@@ -3,13 +3,17 @@
 import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import RecenterButton from './RecenterButton';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoia2h1c2h1LXNpbmdoIiwiYSI6ImNtN3hudWR3YjAxMWYybHNmN3p0ZTNoY20ifQ.JL_UC09YqYLKew0IsRG6sA';
 
 const MapboxGlobe = () => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
-    const defaultZoom = 1; // Default zoom level
-    const zoomedInLevel = 6; // Zoom level when clicking a marker
+    const mapRef = useRef<mapboxgl.Map | null>(null); // Fix: Store map instance
+
+    const defaultZoom = 1.5; 
+    const zoomedInLevel = 3;
+    const defaultCenter: [number, number] = [76, 20];
 
     useEffect(() => {
         if (!mapContainerRef.current) return;
@@ -19,14 +23,22 @@ const MapboxGlobe = () => {
             style: 'mapbox://styles/mapbox/streets-v11',
             projection: 'globe',
             zoom: defaultZoom,
-            center: [30, 15]
+            center: defaultCenter,
         });
 
-        map.addControl(new mapboxgl.NavigationControl());
+        mapRef.current = map; // **Fix: Assign map instance to ref**
+
+        const defNavBtn = new mapboxgl.NavigationControl();
+        map.addControl(defNavBtn, 'bottom-left');
+        
         map.scrollZoom.enable();
 
         map.on('style.load', () => {
-            map.setFog({});
+            map.setFog({
+                color: 'rgba(200, 200, 200, 0.5)',
+                "horizon-blend": 0.05,
+                "range": [0.8, 8], 
+            });
             loadMarkers(map);
         });
 
@@ -38,8 +50,6 @@ const MapboxGlobe = () => {
             const response = await fetch('/coordinates.json');
             const data = await response.json();
 
-            console.log("Fetched Data:", data);
-
             if (!Array.isArray(data)) {
                 console.error("Invalid JSON format. Expected an array.");
                 return;
@@ -47,7 +57,6 @@ const MapboxGlobe = () => {
 
             const markers: { [key: string]: { count: number; coords: [number, number] } } = {};
 
-            // Aggregate alumni count per location
             data.forEach(({ latitude, longitude }) => {
                 if (isNaN(latitude) || isNaN(longitude)) return;
 
@@ -59,7 +68,6 @@ const MapboxGlobe = () => {
                 }
             });
 
-            // Add clustered markers with click-to-zoom feature
             Object.values(markers).forEach(({ count, coords }) => {
                 const el = document.createElement('div');
                 el.style.width = `${15 + count * 2}px`;
@@ -86,11 +94,11 @@ const MapboxGlobe = () => {
                         map.flyTo({
                             center: coords,
                             zoom: zoomedInLevel,
-                            speed: 1.5, // Smooth transition
+                            speed: 1.5, 
                         });
                     } else {
                         map.flyTo({
-                            center: [30, 15], // Reset to default center
+                            center: defaultCenter, 
                             zoom: defaultZoom,
                             speed: 1.5,
                         });
@@ -103,7 +111,25 @@ const MapboxGlobe = () => {
         }
     };
 
-    return <div ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />;
+    // **Fix: Now mapRef.current will contain the Mapbox instance**
+    const recenterMap = () => {
+        if (mapRef.current) {
+            mapRef.current.flyTo({
+                center: defaultCenter,
+                zoom: defaultZoom,
+                speed: 1.5,
+            });
+        } else {
+            console.error("Map instance not initialized");
+        }
+    };
+
+    return(
+        <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+            <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+            <RecenterButton onRecenter={recenterMap} />
+        </div>
+    );
 };
 
 export default MapboxGlobe;
