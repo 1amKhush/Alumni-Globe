@@ -12,7 +12,7 @@ const RecenterButton: React.FC<RecenterButtonProps> = ({ onRecenter }) => {
             onClick={onRecenter} 
             style={{
                 position: 'absolute',
-                bottom: '20%',  // Adjusted to align with Mapbox controls
+                top: '37%',  // Adjusted to align with Mapbox controls
                 left: '10px',     // Keeps it near default controls
                 width: '32px',    
                 height: '32px',  

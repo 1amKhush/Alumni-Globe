@@ -1,12 +1,16 @@
-import { config } from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 import MapboxGlobe from "../components/MapboxGlobe";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <main style={{ width: "100vw", height: "100vh" }}>
-      <MapboxGlobe />
+    <main className="w-screen h-screen flex flex-col">
+      <Navbar/>
+      <div className="flex-grow flex justify-center items-center">
+        <MapboxGlobe />
+      </div>
     </main>
   );
 }

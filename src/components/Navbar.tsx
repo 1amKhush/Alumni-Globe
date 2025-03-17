@@ -5,9 +5,6 @@ import React, { useState, useEffect } from "react";
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const menuSlide = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -15,7 +12,6 @@ const Navbar: React.FC = () => {
     };
     window.addEventListener("resize", handleResize);
     handleResize();
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -25,130 +21,70 @@ const Navbar: React.FC = () => {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        height: "12%",
+        padding: "10px 20px",
         background:
           "linear-gradient(to bottom,rgb(91, 10, 10),rgb(56, 2, 2),rgb(1, 2, 34))",
         color: "white",
-        fontFamily: " Playfair Display",
-
-        position: "relative",
+        fontFamily: "Playfair Display",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 1000,
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
         <img
           src="IIT-logo.png"
           alt="IIT Jodhpur Logo"
-          style={{ height: "65px", marginLeft: "10px" }}
-        ></img>
-        <h2
-          style={{
-            margin: "0",
-            fontSize: "24px",
-            fontFamily: "Playfair Display",
-            // whiteSpace: "nowrap",
-          }}
-        >
+          style={{ height: "50px", marginRight: "10px" }}
+        />
+        <h2 style={{ margin: 0, fontSize: "20px" }}>
           IIT Jodhpur: Society of Alumni Affairs
         </h2>
       </div>
 
       {isSmallScreen && (
-        <div style={{ cursor: "pointer" }} onClick={menuSlide}>
-          <img src="menu-icon.svg" alt="Menu" style={{ height: "35px" }}></img>
+        <div style={{ cursor: "pointer" }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <img src="menu-icon.svg" alt="Menu" style={{ height: "35px" }} />
         </div>
       )}
 
       <ul
         style={{
-          zIndex: "1000",
-          listStyleType: "none",
-          display: isSmallScreen && !isMenuOpen ? "none" : "flex",
+          listStyle: "none",
+          display: isSmallScreen ? (isMenuOpen ? "flex" : "none") : "flex",
           flexDirection: isSmallScreen ? "column" : "row",
-          justifyContent: isSmallScreen
-            ? isMenuOpen
-              ? "space-evenly"
-              : undefined
-            : undefined,
           alignItems: "center",
-          gap: isSmallScreen ? "0" : "25px",
-          position: isSmallScreen
-            ? isMenuOpen
-              ? "absolute"
-              : undefined
-            : "relative",
-          top: isSmallScreen ? (isMenuOpen ? "76px" : undefined) : undefined,
-          right: isSmallScreen ? (isMenuOpen ? "0" : undefined) : "20px",
-          backgroundColor:
-            isSmallScreen && isMenuOpen ? "rgba(29, 2, 2, 0.83)" : undefined,
-          width: isSmallScreen && isMenuOpen ? "30%" : undefined,
-          height: isSmallScreen && isMenuOpen ? "70vh" : undefined,
-          paddingLeft: isSmallScreen && isMenuOpen ? "20px" : undefined,
+          gap: "20px",
+          position: isSmallScreen ? "absolute" : "relative",
+          top: isSmallScreen ? "60px" : "auto",
+          left: 0,
+          width: isSmallScreen ? "100%" : "auto",
+          background: isSmallScreen ? "rgba(29, 2, 2, 0.95)" : "transparent",
+          padding: isSmallScreen ? "10px 0" : 0,
+          textAlign: "center",
         }}
       >
-        <li>
-          <a
-            href="#"
-            style={{
-              color: "white",
-
-              fontSize: "16px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            INITIATIVES
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            style={{
-              color: "white",
-
-              fontSize: "16px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            COMMUNITY
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            style={{
-              color: "white",
-
-              fontSize: "16px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            EVENTS
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            style={{
-              color: "white",
-              fontSize: "16px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            REYA AWARDS
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            style={{
-              color: "white",
-
-              fontSize: "16px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            LEGACY
-          </a>
-        </li>
+        {["INITIATIVES", "COMMUNITY", "EVENTS", "REYA AWARDS", "LEGACY"].map(
+          (item) => (
+            <li key={item}>
+              <a
+                href="#"
+                style={{
+                  color: "white",
+                  fontSize: "16px",
+                  fontFamily: "sans-serif",
+                  textDecoration: "none",
+                  padding: "10px",
+                  display: "block",
+                }}
+              >
+                {item}
+              </a>
+            </li>
+          )
+        )}
       </ul>
     </nav>
   );
