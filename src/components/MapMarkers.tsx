@@ -47,7 +47,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
           },
           cluster: true,
           clusterMaxZoom: 14,
-          clusterRadius: 100,
+          clusterRadius: 50,
         });
 
         map.addLayer({
