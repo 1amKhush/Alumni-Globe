@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { createRoot } from 'react-dom/client';
+import PopupCard from './PopupCard'; // Import the new PopupCard component
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 interface MapMarkersProps {
   map: mapboxgl.Map;
 }
 
 const zoomedInLevel = 3;
-const defaultZoom = 1.5;
-const defaultCenter: [number, number] = [76, 20];
 
 const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
         const data = await response.json();
         if (!Array.isArray(data)) throw new Error("Invalid JSON format. Expected an array.");
 
-        const features = data.map(({ lat, lng, name }: { lat: string; lng: string; name: string }) => ({
+        const features: Feature<Geometry, GeoJsonProperties>[] = data.map(({ lat, lng, name, batch, branch, company, position, linkedin, email, photo }) => ({
           type: 'Feature',
           geometry: {
             type: 'Point',
@@ -29,6 +30,13 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
           },
           properties: {
             name,
+            batch,
+            branch,
+            company,
+            position,
+            linkedin,
+            email,
+            photo
           },
         }));
 
@@ -59,20 +67,20 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
             'circle-color': [
               'step',
               ['get', 'point_count'],
-              '#51bbd6',  // <= 10 points
+              '#51bbd6',
               10,
-              '#f1f075',  // <= 30 points
+              '#f1f075',
               30,
-              '#f28cb1',  // > 30 points
+              '#f28cb1',
             ],
             'circle-radius': [
               'step',
               ['get', 'point_count'],
-              15, // <= 10 points
+              15,
               10,
-              20, // <= 30 points
+              20,
               30,
-              25, // > 30 points
+              25,
             ],
             'circle-stroke-width': 2,
             'circle-stroke-color': '#fff',
@@ -101,8 +109,8 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
           filter: ['!', ['has', 'point_count']],
           paint: {
             'circle-color': '#ff5c5c',
-            'circle-radius': 6,
-            'circle-stroke-width': 1,
+            'circle-radius': 8,
+            'circle-stroke-width': 2,
             'circle-stroke-color': '#fff',
           },
         });
@@ -116,17 +124,34 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
             if (err) return;
             map.flyTo({
               center: (features[0].geometry as any).coordinates,
-              zoom,
+              zoom: zoom || zoomedInLevel,
               speed: 1.5,
             });
           });
         });
 
         map.on('click', 'unclustered-point', (e) => {
-          const coords = (e.features?.[0].geometry as any).coordinates;
+          const coordinates = (e.features?.[0].geometry as any).coordinates.slice();
+          const properties = e.features?.[0].properties;
+
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+
+          const popupNode = document.createElement('div');
+          const root = createRoot(popupNode);
+          root.render(<PopupCard properties={properties} />);
+
+          new mapboxgl.Popup({ closeOnClick: true, closeButton: false, className: "alumni-popup" })
+            .setLngLat(coordinates)
+            .setDOMContent(popupNode)
+            .addTo(map);
+
+            const zoom = map.getZoom() > zoomedInLevel ? map.getZoom() : zoomedInLevel
+
           map.flyTo({
-            center: coords,
-            zoom: zoomedInLevel,
+            center: coordinates,
+            zoom: zoom || zoomedInLevel,
             speed: 1.5,
           });
         });

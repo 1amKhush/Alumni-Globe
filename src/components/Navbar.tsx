@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,69 +18,41 @@ const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 20px",
-        background:
-          "linear-gradient(to bottom,rgb(91, 10, 10),rgb(56, 2, 2),rgb(1, 2, 34))",
-        color: "white",
-        fontFamily: "Playfair Display",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 1000,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center" }}>
+    <nav className="flex justify-between items-center p-4 bg-gray-800 text-white shadow-md w-full z-50">
+      <div className="flex items-center">
         <img
           src="IIT-logo.png"
           alt="IIT Jodhpur Logo"
-          style={{ height: "50px", marginRight: "10px" }}
+          className="h-12 w-12 mr-4"
         />
-        <h2 style={{ margin: 0, fontSize: "20px" }}>
-          IIT Jodhpur: Society of Alumni Affairs
-        </h2>
+        <div>
+          <h2 className="text-xl font-bold">IIT Jodhpur</h2>
+          <p className="text-sm">Society of Alumni Affairs</p>
+        </div>
       </div>
 
       {isSmallScreen && (
-        <div style={{ cursor: "pointer" }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <img src="menu-icon.svg" alt="Menu" style={{ height: "35px" }} />
+        <div
+          className="cursor-pointer"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} className="h-6 w-6" />
         </div>
       )}
 
       <ul
-        style={{
-          listStyle: "none",
-          display: isSmallScreen ? (isMenuOpen ? "flex" : "none") : "flex",
-          flexDirection: isSmallScreen ? "column" : "row",
-          alignItems: "center",
-          gap: "20px",
-          position: isSmallScreen ? "absolute" : "relative",
-          top: isSmallScreen ? "60px" : "auto",
-          left: 0,
-          width: isSmallScreen ? "100%" : "auto",
-          background: isSmallScreen ? "rgba(29, 2, 2, 0.95)" : "transparent",
-          padding: isSmallScreen ? "10px 0" : 0,
-          textAlign: "center",
-        }}
+        className={`
+          ${isSmallScreen ? "absolute top-16 left-0 w-full bg-gray-800" : "flex"}
+          ${isMenuOpen || !isSmallScreen ? "flex" : "hidden"}
+          flex-col md:flex-row items-center gap-6 p-4 md:p-0
+        `}
       >
         {["INITIATIVES", "COMMUNITY", "EVENTS", "REYA AWARDS", "LEGACY"].map(
           (item) => (
             <li key={item}>
               <a
                 href="#"
-                style={{
-                  color: "white",
-                  fontSize: "16px",
-                  fontFamily: "sans-serif",
-                  textDecoration: "none",
-                  padding: "10px",
-                  display: "block",
-                }}
+                className="text-white text-base font-sans hover:text-blue-300 transition-colors duration-300"
               >
                 {item}
               </a>
