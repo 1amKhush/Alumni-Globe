@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 
@@ -20,9 +21,11 @@ const Navbar: React.FC = () => {
   return (
     <nav className="flex justify-between items-center p-4 bg-gray-800 text-white shadow-md w-full z-50">
       <div className="flex items-center">
-        <img
-          src="IIT-logo.png"
+        <Image
+          src="/IIT-Logo.png"
           alt="IIT Jodhpur Logo"
+          width={48}
+          height={48}
           className="h-12 w-12 mr-4"
         />
         <div>

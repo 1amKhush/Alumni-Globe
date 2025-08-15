@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { createRoot } from 'react-dom/client';
-import PopupCard from './PopupCard'; // Import the new PopupCard component
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import PopupCard from './PopupCard';
+import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
+import { Alumni } from '../types/alumni';
 
 interface MapMarkersProps {
   map: mapboxgl.Map;
@@ -116,23 +117,28 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
         });
 
         map.on('click', 'clusters', (e) => {
-          const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-          const clusterId = features[0].properties?.cluster_id;
-          const source = map.getSource('markers') as mapboxgl.GeoJSONSource;
+            if (!e.features || e.features.length === 0) return;
+            const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+            const clusterId = features[0].properties?.cluster_id;
+            const source = map.getSource('markers') as mapboxgl.GeoJSONSource;
 
-          source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-            if (err) return;
-            map.flyTo({
-              center: (features[0].geometry as any).coordinates,
-              zoom: zoom || zoomedInLevel,
-              speed: 1.5,
+            source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+              if (err) return;
+              const geometry = features[0].geometry as Point;
+              map.flyTo({
+                center: geometry.coordinates as [number, number],
+                zoom: zoom || zoomedInLevel,
+                speed: 1.5,
+              });
             });
-          });
         });
 
         map.on('click', 'unclustered-point', (e) => {
-          const coordinates = (e.features?.[0].geometry as any).coordinates.slice();
-          const properties = e.features?.[0].properties;
+          if (!e.features || e.features.length === 0) return;
+          const geometry = e.features[0].geometry as Point;
+          const coordinates = geometry.coordinates.slice() as [number, number];
+          const properties = e.features[0].properties;
+
 
           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -140,7 +146,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ map }) => {
 
           const popupNode = document.createElement('div');
           const root = createRoot(popupNode);
-          root.render(<PopupCard properties={properties} />);
+          root.render(<PopupCard properties={properties as Alumni | undefined} />);
 
           new mapboxgl.Popup({ closeOnClick: true, closeButton: false, className: "alumni-popup" })
             .setLngLat(coordinates)

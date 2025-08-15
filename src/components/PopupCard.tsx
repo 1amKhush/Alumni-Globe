@@ -1,9 +1,11 @@
 import React from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { Alumni } from '../types/alumni';
 
-const PopupCard = ({ properties }: any) => {
+const PopupCard = ({ properties }: { properties: Alumni | null | undefined }) => {
   if (!properties) {
     return null;
   }
@@ -15,12 +17,18 @@ const PopupCard = ({ properties }: any) => {
       <div className="relative">
         <div className="h-24 bg-blue-500"></div>
         <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
-          <img className="w-24 h-24 rounded-full border-4 border-white shadow-md" src={photo || "https://via.placeholder.com/150"} alt={name} />
+          <Image
+            className="w-24 h-24 rounded-full border-4 border-white shadow-md"
+            src={photo || "https://via.placeholder.com/150"}
+            alt={name}
+            width={96}
+            height={96}
+          />
         </div>
       </div>
       <div className="text-center mt-14 p-4">
         <h3 className="text-xl font-bold">{name}</h3>
-        <p className="text-sm text-gray-600">{batch} | {branch}</p>
+        <p className="text-sm text-gray-600">{`${batch} | ${branch}`}</p>
         <p className="mt-2 text-sm">{position} at <strong>{company}</strong></p>
       </div>
       <div className="flex justify-center pb-4">

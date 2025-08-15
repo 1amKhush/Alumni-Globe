@@ -13,6 +13,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@types/geojson": "^7946.0.16",
     "feather-icons": "^4.29.2",
     "lucide-react": "^0.514.0",
     "mapbox-gl": "^3.10.0",
